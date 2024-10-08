@@ -1077,7 +1077,41 @@ PERP_SEXM PERP_SEXU
 2023  93 104 109  85 111 130 152 108 105  99  71  83</code></pre>
 </div>
 </div>
-<div id="cell-34" class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="143">
+<div id="cell-33" class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="18">
+<div class="cell-output cell-output-display">
+<pre><code>Series: monthly_incident_ts 
+ARIMA(1,0,0)(1,1,0)[12] with drift 
+
+Coefficients:
+         ar1     sar1    drift
+      0.6957  -0.3703  -0.3007
+s.e.  0.0507   0.0662   0.4204
+
+sigma^2 = 906.9:  log likelihood = -983.79
+AIC=1975.58   AICc=1975.78   BIC=1988.85
+
+Training set error measures:
+                      ME     RMSE      MAE       MPE     MAPE      MASE
+Training set -0.01241811 29.05056 21.49203 -2.150574 17.37663 0.7560569
+                    ACF1
+Training set -0.07634969</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="nypd_data_assignment_files/figure-revealjs/cell-19-output-2.png" width="840" height="600"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="nypd_data_assignment_files/figure-revealjs/cell-19-output-3.png" width="840" height="600"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-34" class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="19">
 <div class="cell-output cell-output-display">
 <table class="dataframe caption-top" data-quarto-postprocess="true">
 <caption>A data.frame: 12 x 6</caption>
@@ -1201,7 +1235,7 @@ PERP_SEXM PERP_SEXU
 </div>
 </div>
 <p>That’s the end of the analysis I’m comfortable with. Below I wanted to see what it would look like to do similar modeling with multiple predictor variables (perp sex, race, borough.) It looks like it worked, but it gets out of hand to interpret it pretty quickly so I just stopped and left it here as an interesting example of what else could be done.</p>
-<div id="cell-36" class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="144">
+<div id="cell-36" class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="20">
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "WHITE"             "AM_INDIAN/ALASKAN" "ASIAN_PAC_ISLAND" 
 [4] "BLACK"             "BLACK HISPANIC"    "UNKNOWN"          
@@ -1262,7 +1296,7 @@ Number of Fisher Scoring iterations: 9
 </section>
 <section class="slide level2 center">
 
-<div id="cell-40" class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="147">
+<div id="cell-40" class="cell" data-vscode="{&quot;languageId&quot;:&quot;r&quot;}" data-execution_count="23">
 <div class="cell-output cell-output-display">
 <pre><code>R version 4.4.1 (2024-06-14)
 Platform: aarch64-apple-darwin20
