@@ -1,28 +1,37 @@
 ---
-title: "NY Shooting Incident Report"
+title: NY Shooting Incident Report
 author: CS
 format:
   pdf: default
- 
+  docx: default
+  revealjs:
+    theme: default
+    slideNumber: true
+    transition: fade
+    center: true
+    controls: true
+    fig:
+      width: 8
+      height: 5
+jupyter: ir
 ---
 
+
 <!-- For PDF export only -->
-
+::: {pdf}
 ## Assignment.
-
 Import, tidy and analyze the NYPD Shooting Incident dataset obtained. Be sure your project is reproducible and contains some visualization and analysis. You may use the data to do any analysis that is of interest to you. You should include at least two visualizations and one model. Be sure to identify any bias possible in the data and in your analysis.
+:::
 
-## Libraries
-Note the addition of the forecast library in addition to the standard tidyverse and lubridate libraries.
-
-
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 library(tidyverse)
 library(lubridate)
 library(forecast)
 ```
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # import the source data and put it in a df
 source_url <- paste0(
   "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?",
@@ -34,14 +43,16 @@ incident_df <- read.csv(source_url)
 
 ## Explore
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # see what columns we have and what data types
 glimpse(incident_df)
 ```
 
 I already see lots of nulls, empty strings, missing values, etc. Let's take a closer look at some of the categorical columns to see if there are a limited number of consistently entered values or if they were entered as free text, which might be too difficult to clean.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # break out all the unique values and counts
 desc_counts <- lapply(incident_df[,
   c(
@@ -60,18 +71,21 @@ print(desc_counts)
 
 Everything seems to be consistently entered (no misspellings or variations.) But there is a weird mix of "unknown", "U", and "null". It will probably be best to recode empty values as "Unknown" for consistency. There is something weird in a few columns too.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 unique(incident_df$PERP_RACE)
 table(incident_df$PERP_RACE)
 ```
 
-Oh, that's annoying - there is an empty string `''` as one of the largest groups, I guess the best option will be to categorize that as `"UNKNOWN"` as well. While I'm at it I'm going to make the date time columns a little more usable by separating out the date and time and converting them to the right type.
+Oh, that's annoying - there is an empty string ```''``` as one of the largest groups, I guess the best option will be to categorize that as ```"UNKNOWN"``` as well. While I'm at it I'm going to make the date time columns a little more usable by separating out the date and time and converting them to the right type.
 
-------------------------------------------------------------------------
+
+---
 
 ## Cleanup
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 clean_incident_df <- incident_df %>%
   mutate(
     # Combine the date and time into a proper DateTime object
@@ -126,14 +140,15 @@ print(tail(clean_incident_df))
 
 I'm going to make a few different dataframes with different groups for eventual analysis and plotting. Things I'm going to start with
 
--   Daily incidents over time to look for general trends
--   Incidents by month and year
--   Incidents by borough
--   Incidents by month (not over time, so total incidents that occured in each month summed over all years)
--   Time and year data broken down by borough
--   Victim and perpetrator by sex
+* Daily incidents over time to look for general trends
+* Incidents by month and year
+* Incidents by borough
+* Incidents by month (not over time, so total incidents that occured in each month summed over all years)
+* Time and year data broken down by borough
+* Victim and perpetrator by sex
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # for plotting incidents over time
 time_series_df <- clean_incident_df %>%
   mutate(simple_date = as.Date(OCCUR_DATE, format = "%m/%d/%Y")) %>%
@@ -187,17 +202,19 @@ tail(totals_by_sex,9)
 
 That's looks pretty good. We'll progress through some basic plots to see what patterns or trends we see which can guide the next visualizations.
 
-------------------------------------------------------------------------
+---
 
 ## Visualization
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # Set global plot size options for the notebook
 options(repr.plot.width = 10, repr.plot.height = 7)
 ```
 
-``` {r}
+```{r}
 #| fig-align: center
+#| vscode: {languageId: r}
 theme_set(theme_minimal())
 
 # plot daily incidents
@@ -210,12 +227,13 @@ ggplot(time_series_df, aes(x = simple_date, y = total_by_day)) +
   )
 ```
 
-Fig 1 - Daily incidents - hard to see many trends since the data is so noisy, but it does look like it's generally periodic and there is a big spike around the first covid summer.
+Fig 1 -  Daily incidents - hard to see many trends since the data is so noisy, but it does look like it's generally periodic and there is a big spike around the first covid summer.
 
-------------------------------------------------------------------------
+---
 
-``` {r}
+```{r}
 #| fig-align: center
+#| vscode: {languageId: r}
 
 # plot monthly incidents over time
 ggplot(time_series_df, aes(x = month_year, y = total_by_day)) +
@@ -228,12 +246,13 @@ ggplot(time_series_df, aes(x = month_year, y = total_by_day)) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year")
 ```
 
-Fig 2 - Total occurences by month over time - clearer seasonality and a little easier to see the pre- and post-covid trends
+Fig 2 -  Total occurences by month over time - clearer seasonality and a little easier to see the pre- and post-covid trends
 
-------------------------------------------------------------------------
+---
 
-``` {r}
+```{r}
 #| fig-align: center
+#| vscode: {languageId: r}
 # plot yearly incidents
 ggplot(time_series_df, aes(
   x = year(simple_date), 
@@ -246,9 +265,10 @@ ggplot(time_series_df, aes(
 
 ```
 
-Fig 3 - Total occurences by year - now we can see trends. Decreasing incidents starting in the early 20-teens and flattening out, before a big covid spike and almost back down to pre-covid levels.
+Fig 3 -  Total occurences by year - now we can see trends. Decreasing incidents starting in the early 20-teens and flattening out, before a big covid spike and almost back down to pre-covid levels.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 
 # Plot occurrences by month (across all years)
 ggplot(time_series_df, aes(
@@ -267,11 +287,12 @@ ggplot(time_series_df, aes(
 
 ```
 
-Fig 4 - Total occurences by month - pretty strong visual trend towards higher incidents in the hottest months, which is a well studied phenomenon.
+Fig 4 -  Total occurences by month - pretty strong visual trend towards higher incidents in the hottest months, which is a well studied phenomenon.
 
-------------------------------------------------------------------------
+---
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 
 # Plot total by borough
 ggplot(total_by_borough, aes(
@@ -289,11 +310,12 @@ ggplot(total_by_borough, aes(
   )
 ```
 
-Fig 5 - Total by borough - generaly interesting, but would be more useful with the context of per capita and per area data for the boroughs.
+Fig 5 -  Total by borough - generaly interesting, but would be more useful with the context of per capita and per area data for the boroughs.
 
-------------------------------------------------------------------------
+---
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 
 # Borough totals monthly
 ggplot(monthly_totals_by_borough, aes(
@@ -327,11 +349,12 @@ ggplot(monthly_totals_by_borough, aes(
     y = "Total Incidents")
 ```
 
-Fig 6/7 - Boroughs over time - interesting to see that not all boroughs follow the same trends over time, and that the first covid spike was driven heavily by increased in Brooklyn.
+Fig 6/7 -  Boroughs over time - interesting to see that not all boroughs follow the same trends over time, and that the first covid spike was driven heavily by increased in Brooklyn.
 
-------------------------------------------------------------------------
+---
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 
 # plot for total victims of each sex by perpetrator sex
 ggplot(totals_by_sex, aes(
@@ -353,7 +376,8 @@ Fig 8 - Totals of victim sex group by perpetrator sex - there are fewer total fe
 
 We could keep going with similar visuals (breakdown by race, gender, age group, etc. or relationships between group like victime age relative to perpetrator age) but I'll stop there. I'm going to focus on victim sex for the analysis and modeling component. I want to see how predictive of a victime being female some of the other attributes (perpetrator race and sex, victime race). I'll start with a simple model of victim sex as predicted by perpetrator sex. To start will have to exclude the "unknowns" from victim sex and clean up some of the other factors.
 
-------------------------------------------------------------------------
+
+---
 
 ## Modeling
 
@@ -361,7 +385,8 @@ We could keep going with similar visuals (breakdown by race, gender, age group, 
 
 For my first simple model I want to do a basic breakdown or how a perpetrator of a given sex affects the odds of the victim being a give sex.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # Convert all categorical variables to factors
 clean_incident_df$VIC_SEX <- factor(clean_incident_df$VIC_SEX)
 clean_incident_df$BORO <- factor(clean_incident_df$BORO)
@@ -385,7 +410,8 @@ levels(clean_incident_df$PERP_SEX)
 levels(clean_incident_df$PERP_RACE)
 ```
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # create a simple generalize linear model to predict odds of female victim
 # based on perp sex
 simple_model_vic_sex <- glm(VIC_SEX ~ PERP_SEX,
@@ -398,7 +424,8 @@ summary(simple_model_vic_sex)
 
 It looks like each perpetrator sex option has a statistically significant effect on the change in log-odds of the victim being female, so I'll pull out each of them and convert them to odds.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 print("Log-odds are")
 print(coef(simple_model_vic_sex)[c("PERP_SEXM","PERP_SEXU")])
 
@@ -431,7 +458,8 @@ paste0(
 
 This isn't exactly a model, but I wanted to see how consistently the ratios of incidents in the Summer relative to Winter have been year over year.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # make a better df for monthly modeling
 monthly_totals <- time_series_df %>%
   group_by(month_year) %>%
@@ -441,7 +469,8 @@ monthly_totals <- time_series_df %>%
 tail(monthly_totals)
 ```
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # make a simple ratio model based on high and low seasons
 # Aggregate by year and calculate sum for January-March and 
 seasonal_totals <- df_aggregated %>%
@@ -476,9 +505,11 @@ I think this is an interesting view of how consistently the ratio of incidents i
 
 ### More advance forecasting model
 
+
 I want to take it a step further and see what could be done with some simple forecasting models. Will use seasonal ARIMA (SARIMA) which considers seasonality as well as recent trends to create a future forecast. It's import to not that this model uses only the previous data, it doesn't consider other variables. For instance, if there are always higher shooting rates when the year before was hotter or the stock market was lower, it won't include that information.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # make time series friendly
 start_year <- as.numeric(format(min(monthly_totals$month_year), "%Y"))
 start_month <- as.numeric(format(min(monthly_totals$month_year), "%m"))
@@ -490,7 +521,8 @@ monthly_incident_ts <- ts(monthly_totals$total_by_month, start = c(start_year, s
 print(monthly_incident_ts)
 ```
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 sarima_forecast <- auto.arima(monthly_incident_ts, seasonal = TRUE)
 
 # Summary of the SARIMA model
@@ -511,7 +543,8 @@ autoplot(forecast_values) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 # Print the confidence intervals for the next 5 months
 next_12_conf_intervals <- data.frame(
   month2024 = c(1:12),  
@@ -531,7 +564,8 @@ That's pretty neat. Relatively wide confidence intervals but the forecasted tren
 
 That's the end of the analysis I'm comfortable with. Below I wanted to see what it would look like to do similar modeling with multiple predictor variables (perp sex, race, borough.) It looks like it worked, but it gets out of hand to interpret it pretty quickly so I just stopped and left it here as an interesting example of what else could be done.
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 model_vic_sex <- glm(VIC_SEX ~ BORO + VIC_RACE + 
   PERP_SEX + PERP_RACE, 
   family=binomial, 
@@ -544,9 +578,10 @@ print(levels(clean_incident_df$BORO))
 print(summary(model_vic_sex))
 ```
 
-``` {r}
+```{r}
 #| echo: false
 #| include: false
+#| vscode: {languageId: r}
 
 library(broom)
 
@@ -554,9 +589,10 @@ tidy_model <- tidy(model_vic_sex)
 print(tidy_model, n=Inf)
 ```
 
-``` {r}
+```{r}
 #| echo: false
 #| include: false
+#| vscode: {languageId: r}
 
 # Convert to a dataframe and print
 tidy_model_df <- as.data.frame(tidy_model)
@@ -572,14 +608,17 @@ tidy_model_df_formatted$p.value <- format(
 (tidy_model_df_formatted)
 ```
 
-## Potential Bias
+## Potential Bias {.smaller}
 
 There are several sources of potential bias in this report:
 
-- Collection bias: Some of the categorical variable options, such as the descriptions of locations or location categories, are limited, and some actual locations may be ambiguous. The racial categorization options are also somewhat limited compared to the true diversity of racial and ethnic backgrounds. The racial categorization is likely to have been chosen by someone other than the subject, so the selected race may not be accurate or reflect how the subject (victim or perpetrator) would self-identify.
+* **Collection bias**: Some of the categorical variable options, such as the descriptions of locations or location categories, are limited, and some actual locations may be ambiguous. The racial categorization options are also somewhat limited compared to the true diversity of racial and ethnic backgrounds. The racial categorization is likely to have been chosen by someone other than the subject, so the selected race may not be accurate or reflect how the subject (victim or perpetrator) would self-identify.
 
-- Analysis bias: There are likely many interesting insights in this data regarding race (relationship between race of perpetrator and victim, racial distribution of incidents throughout the boroughs, etc.), but I deliberately avoided any in-depth analysis of those categories. I believed it would be more complicated and nuanced than my current ability and available time would allow me to do well.
+* **Analysis bias**: There are likely many interesting insights in this data regarding race (relationship between race of perpetrator and victim, racial distribution of incidents throughout the boroughs, etc.), but I deliberately avoided any in-depth analysis of those categories. I believed it would be more complicated and nuanced than my current ability and available time would allow me to do well.
+---
 
-``` {r}
+```{r}
+#| vscode: {languageId: r}
 sessionInfo()
 ```
+
