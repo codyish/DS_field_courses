@@ -17,9 +17,10 @@ library("tidyverse")
 
 ## Goal
 
-My main goal will be to see if I can get a general sense of how the number of deaths relative to the number of cases changed as vaccines were developed and rolled out.
+My main goal will be to see if the is a clear trend of how the number of deaths relative to the number of cases changed as vaccines were developed and rolled out.
 
 ## Import Data
+The source of the data is the online covid tracking and analysis project from Johns Hopkins University. 
 
 ```{r}
 #| vscode: {languageId: r}
@@ -445,7 +446,7 @@ combined_model_df <- inner_join(weekly_global_combo, weekly_us_combo, by = "Week
 tail(combined_model_df)
 ```
 
-### Final Combined Models and Visuals
+### Final Combined Models, Visuals, and Conclusion
 
 ```{r}
 #| vscode: {languageId: r}
@@ -471,7 +472,7 @@ print(combined_means_plot)
 print(combined_model_plot)
 ```
 
-I think that accomplishes the goal. With these two figures we can see the changes in the death to cases ratios before and after (and during) the vaccine rollout for the global and USA datasets, as well as the general linear trend during each phase.
+Conclusion: With these two figures we can see there was a substantial drop in the death to cases ratios after the vaccine rollout for the global and USA datasets.  The general linear trend during each phase is also visible.
 
 ## Bias statement
 There are a few potential sources of bias or inaccuracy in this data and the analysis.
